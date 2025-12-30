@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
   forgot: {
     fontSize: 13,
-    color: "#007AFF",
+    color: "#125300ff",
     textAlign: "right",
     marginTop: 4,
   },

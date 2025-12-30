@@ -1,46 +1,142 @@
-import { useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { BackHandler, Dimensions, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated';
+import GradientBackground from '../../components/ui/background';
+import CustomButton from '../../components/ui/Button';
+import WelcomeBanner from '../../components/ui/welcome';
 
-export default function Signup({ navigation }) {
+const { width } = Dimensions.get('window');
+
+export default function Signup() {
+  const router = useRouter();
+
+  // Handle back button press
+  useEffect(() => {
+    const backAction = () => {
+      router.back();
+      return true; // Prevent default behavior
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [router]);
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignup = () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill all fields');
-      return;
-    }
-
-    // Here you would call your backend API to create the user
-    // For demonstration, we just navigate to Login screen
-    Alert.alert('Success', 'Account created!');
-    navigation.replace('Login');
+    // TODO: Implement signup logic here
+    console.log("Signup attempt with:", { username, email, password });
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+      <GradientBackground>
+        <Animated.View 
+          style={styles.content}
+          entering={FadeIn.duration(300).easing(Easing.out(Easing.ease))}
+          exiting={FadeOut.duration(200).easing(Easing.in(Easing.ease))}
+        >
+          <WelcomeBanner />
+          <Text style={styles.title}>Sign Up</Text>
+          
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Username</Text>
+            <TextInput
+              style={styles.input}
+              value={username}
+              onChangeText={setUsername}
+              placeholder="Enter your username"
+              autoCapitalize="none"
+            />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+            <Text style={styles.label}>Password</Text>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={styles.input}
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Enter your password"
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.eyeIcon}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={20}
+                  color="#555"
+                />
+              </TouchableOpacity>
+            </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleSignup}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+            <Text style={styles.termsText}>
+              By signing up you agree to the <Text style={styles.termsLink}>terms and policies</Text> of this app
+            </Text>
+          </View>
+
+          <View style={styles.buttonsContainer}>
+            <CustomButton 
+              color="#EAFFDE"
+              text="Sign Up"
+              textColor="#000"
+              onPress={handleSignup}
+              style={styles.signupButton}
+            />
+            
+            <Text style={styles.orText}>or sign up with</Text>
+            
+            <View style={styles.socialIcons}>
+              <Animated.View 
+                entering={FadeIn.delay(200).duration(300)}
+                style={styles.socialButtonContainer}
+              >
+                <Pressable 
+                  style={({ pressed }) => [
+                    styles.socialButton,
+                    { transform: [{ scale: pressed ? 0.95 : 1 }] }
+                  ]}
+                  android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true }}
+                >
+                <Ionicons name="logo-google" size={24} color="#DB4437" />
+                </Pressable>
+              </Animated.View>
+              <Animated.View 
+                entering={FadeIn.delay(250).duration(300)}
+                style={styles.socialButtonContainer}
+              >
+                <Pressable 
+                  style={({ pressed }) => [
+                    styles.socialButton,
+                    { transform: [{ scale: pressed ? 0.95 : 1 }] }
+                  ]}
+                  android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true }}
+                >
+                <Ionicons name="logo-facebook" size={24} color="#4267B2" />
+                </Pressable>
+              </Animated.View>
+            </View>
+          </View>
+        </Animated.View>
+      </GradientBackground>
     </View>
   );
 }
@@ -48,33 +144,111 @@ export default function Signup({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    margin: 0,
+    padding: 0,
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    backgroundColor: '#F3FFED',
+    alignItems: 'center',
+    padding: 20,
+    opacity: 1,
+    transform: [{ translateY: 0 }],
+    transition: 'all 0.3s ease-in-out',
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#333',
     marginBottom: 30,
-    textAlign: 'center',
-    color: '#33DB00',
+    marginTop: 20,
+  },
+  inputContainer: {
+    width: width * 0.7039,
+    alignSelf: 'center',
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 6,
+    color: '#333',
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#33DB00',
-    borderRadius: 8,
+    backgroundColor: 'transparent',
     padding: 12,
-    marginBottom: 20,
-    backgroundColor: '#fff',
+    paddingLeft: 0,
+    paddingRight: 40,
+    fontSize: 14,
+    marginBottom: 12,
+    borderWidth: 0,
+    borderBottomWidth: 1,
+    borderColor: '#000',
+    height: 48,
+    width: '100%',
+    lineHeight: 24,
   },
-  button: {
-    backgroundColor: '#33DB00',
-    padding: 15,
-    borderRadius: 8,
+  passwordContainer: {
+    position: 'relative',
+    marginBottom: 20,
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 0,
+    bottom: 12,
+    padding: 8,
+    zIndex: 10,
+  },
+  termsText: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  termsLink: {
+    color: '#125300',
+    textDecorationLine: 'underline',
+  },
+  buttonsContainer: {
+    width: '70.39%',
+    alignSelf: 'center',
     alignItems: 'center',
   },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+  signupButton: {
+    width: '100%',
+    borderRadius: 20,
   },
+  orText: {
+    marginVertical: 15,
+    color: '#666',
+    fontSize: 14,
+    textAlign: 'center',
+    width: '100%',
+  },
+  socialIcons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '70%',
+    marginTop: 15,
+    marginBottom: 10,
+    alignSelf: 'center',
+    gap: 40,
+  },
+  socialButtonContainer: {
+    borderRadius: 30,
+    overflow: 'hidden',
+  },
+  socialButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  }
 });

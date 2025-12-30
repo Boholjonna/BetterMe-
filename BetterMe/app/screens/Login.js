@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import AuthInput from "../../components/ui/Authinput";
@@ -6,6 +7,7 @@ import CustomButton from "../../components/ui/Button";
 import WelcomeBanner from "../../components/ui/welcome";
 
 export default function Login() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -41,7 +43,7 @@ export default function Login() {
               color="#EAFFDE"
               text="Sign Up"
               textColor="#000"
-              onPress={() => {}}
+              onPress={() => router.push('/screens/Signup')}
               style={styles.signupButton}
             />
           </View>
