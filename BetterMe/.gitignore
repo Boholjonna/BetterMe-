@@ -44,9 +44,11 @@ app-example
 .expo/
 .eas/
 .env*
+.env
 .env.local
 .env.production
 .env.development
 .env.production.local
+.env.development.local
 
 
