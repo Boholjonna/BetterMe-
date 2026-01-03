@@ -62,13 +62,14 @@ const handleSignup = async () => {
 
     console.log("Signup attempt with:", { username, email, password });
 
-    // Call Supabase Auth signUp
+    // Call Supabase Auth signUp with username and display_name in metadata
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password: password.trim(),
       options: {
         data: {
           username: username.trim(),
+          'Display name': username.trim(), // Match exact column name in Supabase auth
         },
       },
     });
