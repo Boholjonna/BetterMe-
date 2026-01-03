@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { BackHandler, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, BackHandler, Dimensions, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated';
 import GradientBackground from '../../components/ui/background';
 import CustomButton from '../../components/ui/Button';
@@ -32,6 +32,7 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
@@ -79,18 +80,46 @@ const handleSignup = async () => {
     }
 
     console.log("Signup success:", data);
-    // Navigate to Onboarding screen after successful signup
-    router.push('screens/Onboarding');
+    
+    // Show confirmation dialog
+    setShowConfirmation(true);
+    
   } catch (error) {
     console.error("Unexpected error during signup:", error);
-    alert(`An unexpected error occurred: ${error.message}`);
+    Alert.alert('Error', `An error occurred: ${error.message}`);
   }
 };
 
 
 
+  const handleGoToLogin = () => {
+    setShowConfirmation(false);
+    router.replace('/');
+  };
+
   return (
     <View style={styles.container}>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showConfirmation}
+        onRequestClose={handleGoToLogin}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Verify Your Email</Text>
+            <Text style={styles.modalText}>
+              We've sent a verification link to {email}. Please check your email and click the link to verify your account before signing in.
+            </Text>
+            <CustomButton
+              text="Go to Login"
+              onPress={handleGoToLogin}
+              style={styles.modalButton}
+              textStyle={styles.modalButtonText}
+            />
+          </View>
+        </View>
+      </Modal>
       <GradientBackground>
         <Animated.View 
           style={styles.content}
@@ -165,6 +194,47 @@ const handleSignup = async () => {
 }
 
 const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 25,
+    width: '100%',
+    maxWidth: 400,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#333',
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 25,
+    color: '#555',
+    lineHeight: 22,
+  },
+  modalButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+    width: '100%',
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
     margin: 0,
