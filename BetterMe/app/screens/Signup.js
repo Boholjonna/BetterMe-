@@ -1,4 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { BackHandler, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -31,10 +33,61 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignup = () => {
-    // TODO: Implement signup logic here
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_KEY; 
+ 
+ if (!supabaseUrl || !supabaseAnonKey) { 
+   throw new Error("Missing Supabase environment variables. Check your .env file."); 
+ } 
+
+  const supabase = createClient(supabaseUrl, supabaseAnonKey, { 
+   auth: { 
+     storage: AsyncStorage, 
+     autoRefreshToken: true, 
+     persistSession: true, 
+     detectSessionInUrl: false, 
+   }, 
+ });
+
+
+ 
+const handleSignup = async () => {
+  try {
+    if (!username || !email || !password) {
+      alert('Please fill in all fields');
+      return;
+    }
+
     console.log("Signup attempt with:", { username, email, password });
-  };
+
+    // Call Supabase Auth signUp
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password: password.trim(),
+      options: {
+        data: {
+          username: username.trim(),
+        },
+      },
+    });
+
+    if (error) {
+      console.error("Signup failed:", error);
+      alert(`Signup failed: ${error.message}`);
+      return;
+    }
+
+    console.log("Signup success:", data);
+    // Navigate to Onboarding screen after successful signup
+    router.push('screens/Onboarding');
+  } catch (error) {
+    console.error("Unexpected error during signup:", error);
+    alert(`An unexpected error occurred: ${error.message}`);
+  }
+};
+
+
 
   return (
     <View style={styles.container}>
