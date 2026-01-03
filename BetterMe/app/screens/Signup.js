@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { BackHandler, Dimensions, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { BackHandler, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated';
 import GradientBackground from '../../components/ui/background';
 import CustomButton from '../../components/ui/Button';
@@ -102,38 +102,8 @@ export default function Signup() {
               style={styles.signupButton}
             />
             
-            <Text style={styles.orText}>or sign up with</Text>
             
-            <View style={styles.socialIcons}>
-              <Animated.View 
-                entering={FadeIn.delay(200).duration(300)}
-                style={styles.socialButtonContainer}
-              >
-                <Pressable 
-                  style={({ pressed }) => [
-                    styles.socialButton,
-                    { transform: [{ scale: pressed ? 0.95 : 1 }] }
-                  ]}
-                  android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true }}
-                >
-                <Ionicons name="logo-google" size={24} color="#DB4437" />
-                </Pressable>
-              </Animated.View>
-              <Animated.View 
-                entering={FadeIn.delay(250).duration(300)}
-                style={styles.socialButtonContainer}
-              >
-                <Pressable 
-                  style={({ pressed }) => [
-                    styles.socialButton,
-                    { transform: [{ scale: pressed ? 0.95 : 1 }] }
-                  ]}
-                  android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: true }}
-                >
-                <Ionicons name="logo-facebook" size={24} color="#4267B2" />
-                </Pressable>
-              </Animated.View>
-            </View>
+            
           </View>
         </Animated.View>
       </GradientBackground>
