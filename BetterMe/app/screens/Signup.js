@@ -1,6 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, BackHandler, Dimensions, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -8,6 +6,7 @@ import Animated, { Easing, FadeIn, FadeOut } from 'react-native-reanimated';
 import GradientBackground from '../../components/ui/background';
 import CustomButton from '../../components/ui/Button';
 import WelcomeBanner from '../../components/ui/welcome';
+import { supabase } from '../../utils/supabase';
 
 const { width } = Dimensions.get('window');
 
@@ -35,59 +34,56 @@ export default function Signup() {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
- const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_KEY; 
- 
- if (!supabaseUrl || !supabaseAnonKey) { 
-   throw new Error("Missing Supabase environment variables. Check your .env file."); 
- } 
+const [isLoading, setIsLoading] = useState(false);
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey, { 
-   auth: { 
-     storage: AsyncStorage, 
-     autoRefreshToken: true, 
-     persistSession: true, 
-     detectSessionInUrl: false, 
-   }, 
- });
-
-
- 
 const handleSignup = async () => {
   try {
     if (!username || !email || !password) {
-      alert('Please fill in all fields');
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
-    console.log("Signup attempt with:", { username, email, password });
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
+      return;
+    }
 
-    // Call Supabase Auth signUp with username and display_name in metadata
+    setIsLoading(true);
+    console.log("Signup attempt with:", { username, email });
+
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password: password.trim(),
       options: {
         data: {
           username: username.trim(),
-          'Display name': username.trim(), // Match exact column name in Supabase auth
+          display_name: username.trim(),
         },
       },
     });
 
     if (error) {
       console.error("Signup failed:", error);
-      alert(`Signup failed: ${error.message}`);
+      let errorMessage = error.message;
+      
+      if (error.message.includes('already registered')) {
+        errorMessage = 'This email is already registered. Please log in instead.';
+      } else if (error.message.includes('network')) {
+        errorMessage = 'Network error. Please check your internet connection.';
+      }
+      
+      Alert.alert('Signup Failed', errorMessage);
       return;
     }
 
     console.log("Signup success:", data);
-    
-    // Show confirmation dialog
     setShowConfirmation(true);
     
   } catch (error) {
     console.error("Unexpected error during signup:", error);
-    Alert.alert('Error', `An error occurred: ${error.message}`);
+    Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+  } finally {
+    setIsLoading(false);
   }
 };
 
@@ -179,10 +175,11 @@ const handleSignup = async () => {
           <View style={styles.buttonsContainer}>
             <CustomButton 
               color="#EAFFDE"
-              text="Sign Up"
+              text={isLoading ? 'Signing Up...' : 'Sign Up'}
               textColor="#000"
               onPress={handleSignup}
-              style={styles.signupButton}
+              style={[styles.signupButton, isLoading && styles.disabledButton]}
+              disabled={isLoading}
             />
             
             
@@ -235,6 +232,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  buttonSpacing: {
+    height: 16,
+  },
+  disabledButton: {
+    opacity: 0.7,
   },
   container: {
     flex: 1,
