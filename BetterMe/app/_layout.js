@@ -37,6 +37,7 @@ export default function RootLayout() {
       <Stack.Screen name="screens/Signup" options={{ headerShown: false }} />
       <Stack.Screen name="screens/Goaldashboard" options={{ title: 'Dashboard' }} />
       <Stack.Screen name="screens/Goalist" options={{ title: 'My Goals' }} />
+      <Stack.Screen name="screens/Onboarding" options={{ headerShown: false }} />
       <Stack.Screen name="screens/Goaledits" options={{ title: 'Edit Goal' }} />
       <Stack.Screen name="screens/History" options={{ title: 'History' }} />
       <Stack.Screen name="screens/Settings" options={{ title: 'Settings' }} />
