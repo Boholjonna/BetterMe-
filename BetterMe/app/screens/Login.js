@@ -63,10 +63,14 @@ export default function Login() {
     if (userError || !userData) {
       console.log('No existing user data found, creating new profile...');
       
+
+      const displayName = user.user_metadata?.display_name || 
+                   user.user_metadata?.username ;
+
       const newUserProfile = { 
         uid: user.id, 
         email: user.email,
-        username: user.email.split('@')[0],
+        username:  displayName
        
       };
       
