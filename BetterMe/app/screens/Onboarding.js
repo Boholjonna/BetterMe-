@@ -277,14 +277,18 @@ export default function Onboarding() {
 const styles = StyleSheet.create({
   gradient: {
     flex: 1,
+    justifyContent: 'center',
   },
   scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
     padding: 20,
-    paddingBottom: 40,
+    paddingVertical: 40,
   },
   header: {
     marginBottom: 30,
     alignItems: 'center',
+    marginTop: 20,
   },
   title: {
     fontSize: 32,
@@ -292,6 +296,7 @@ const styles = StyleSheet.create({
     color: '#2E8B57',
     marginBottom: 10,
     textAlign: 'center',
+    marginTop: 10,
   },
   subtitle: {
     fontSize: 16,
@@ -406,8 +411,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   saveButtonContainer: {
-    marginTop: 20,
-    marginBottom: 40,
+    marginVertical: 20,
   },
   saveButton: {
     borderRadius: 10,
