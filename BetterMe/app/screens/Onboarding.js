@@ -68,23 +68,42 @@ export default function Onboarding() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase
+        // Update UserData table
+        const { error: userDataError } = await supabase
           .from('UserData')
           .update({ 
             gender,
             goal,
-            start_date: startDate?.toISOString(),
-            end_date: endDate?.toISOString(),
-            task_frequency: taskFrequency,
-            tasks: JSON.stringify(tasks),
-            updated_at: new Date().toISOString()
+            'start-date': startDate?.toISOString().split('T')[0],
+            'end-date': endDate?.toISOString().split('T')[0],
+            frequency: taskFrequency
           })
           .eq('uid', user.id);
 
+        if (userDataError) throw userDataError;
+
+        // Insert tasks into Tasks table
+        const tasksToInsert = tasks.map(task => ({
+          task: task,
+          uid: user.id,
+          username: username,
+          goal: goal
+        }));
+
+        const { error: tasksError } = await supabase
+          .from('Tasks')
+          .insert(tasksToInsert);
+
+        if (tasksError) throw tasksError;
+
+        // Show success message
         Alert.alert(
-          'Plan Saved',
-          'Your productivity plan has been saved successfully.',
-          [{ text: 'OK', onPress: () => router.replace('/screens/Goalist') }]
+          '🎉 Congratulations!',
+          'Your first step to a better you has been saved successfully!',
+          [{ 
+            text: 'Continue', 
+            onPress: () => router.replace('/screens/Goalist') 
+          }]
         );
       }
     } catch (error) {
